@@ -12,6 +12,7 @@ from app.ai.graph import AnalysisInputError, run_analysis
 from app.ai.llm import LLMAdapter, LLMConfigurationError, LLMProviderError
 from app.config import Settings
 from app.domain.schemas import (
+    ComplaintFields,
     CopilotMessage,
     DraftAnalysisResult,
     DraftResponse,
@@ -21,6 +22,7 @@ from app.domain.schemas import (
 from app.repositories.complaints import ComplaintRepository
 from app.services.corrections import InvalidCorrection, apply_correction
 from app.services.pdf_text import PdfTextError, extract_pdf_text
+from app.services.validation import validate_and_classify
 
 SessionFactory = Callable[[], Session]
 
@@ -35,6 +37,12 @@ class CorrectionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     message: str = Field(min_length=1, max_length=2_000)
+
+
+class UpdateFieldsRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    fields: ComplaintFields
 
 
 def _error(status_code: int, code: str, message: str) -> JSONResponse:
@@ -99,6 +107,44 @@ def create_drafts_router(
                 return repository.update_draft(draft_id, analysis)
             except InvalidCorrection as exc:
                 return _error(422, "invalid_correction", str(exc))
+            except LLMConfigurationError:
+                return _error(503, "ai_not_configured", "AI analysis is not configured")
+            except LLMProviderError:
+                return _error(502, "ai_analysis_failed", "AI analysis could not be completed")
+
+    @router.patch("/{draft_id}/fields", response_model=DraftResponse)
+    def update_fields(draft_id: UUID, payload: UpdateFieldsRequest) -> DraftResponse | JSONResponse:
+        with session_factory() as session:
+            repository = ComplaintRepository(session)
+            draft = repository.get_draft(draft_id)
+            if not draft:
+                return _error(404, "draft_not_found", "Complaint draft was not found")
+            changed = [
+                name
+                for name in ComplaintFields.model_fields
+                if getattr(payload.fields, name) != getattr(draft.fields, name)
+            ]
+            if not changed:
+                return draft
+            completeness, status = validate_and_classify(payload.fields)
+            labels = [name.replace("_", " ") for name in changed]
+            try:
+                analysis = DraftAnalysisResult(
+                    source_type=draft.source_type,
+                    fields=payload.fields,
+                    completeness=completeness,
+                    risk=llm.suggest_risk(payload.fields),
+                    summary=llm.summarize(payload.fields),
+                    status=status,
+                    messages=[
+                        *draft.messages,
+                        CopilotMessage(
+                            role=MessageRole.ASSISTANT,
+                            content=f"Updated form fields: {', '.join(labels)}.",
+                        ),
+                    ],
+                )
+                return repository.update_draft(draft_id, analysis)
             except LLMConfigurationError:
                 return _error(503, "ai_not_configured", "AI analysis is not configured")
             except LLMProviderError:

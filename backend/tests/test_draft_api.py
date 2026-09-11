@@ -101,3 +101,20 @@ def test_conversation_for_missing_draft_returns_404(client):
 
     assert response.status_code == 404
     assert response.json()["code"] == "draft_not_found"
+
+
+def test_direct_form_edit_is_persisted_before_commit(client):
+    created = client.post(
+        "/api/v1/complaint-drafts/analyze-text",
+        json={"text": "A sufficiently detailed complaint for the deterministic fake adapter."},
+    ).json()
+    changed_fields = {**created["fields"], "affected_quantity": "52 capsules"}
+
+    response = client.patch(
+        f"/api/v1/complaint-drafts/{created['id']}/fields",
+        json={"fields": changed_fields},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["fields"]["affected_quantity"] == "52 capsules"
+    assert response.json()["updated_at"] >= created["updated_at"]
