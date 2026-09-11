@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 
 import * as api from "../api/client";
 import type {
+  ComplaintFields,
   ComplaintResponse,
   CopilotMessage,
   DraftResponse,
@@ -15,6 +16,7 @@ export interface ComplaintState {
   ledger: ComplaintResponse[];
   requestStatus: RequestStatus;
   error: string | null;
+  hasUnsavedEdits: boolean;
 }
 
 export const initialState: ComplaintState = {
@@ -23,6 +25,7 @@ export const initialState: ComplaintState = {
   ledger: [],
   requestStatus: "idle",
   error: null,
+  hasUnsavedEdits: false,
 };
 
 export const analyzeText = createAsyncThunk(
@@ -41,6 +44,12 @@ export const sendCorrection = createAsyncThunk(
     api.sendCorrection(draftId, message),
 );
 
+export const saveFields = createAsyncThunk(
+  "complaints/saveFields",
+  async ({ draftId, fields }: { draftId: string; fields: ComplaintFields }) =>
+    api.updateFields(draftId, fields),
+);
+
 export const commitComplaint = createAsyncThunk(
   "complaints/commitComplaint",
   async ({ draftId, commitToken }: { draftId: string; commitToken: string }) =>
@@ -53,6 +62,7 @@ const pendingActions = [
   analyzeText.pending,
   analyzeFile.pending,
   sendCorrection.pending,
+  saveFields.pending,
   commitComplaint.pending,
   loadLedger.pending,
 ] as const;
@@ -61,6 +71,7 @@ const rejectedActions = [
   analyzeText.rejected,
   analyzeFile.rejected,
   sendCorrection.rejected,
+  saveFields.rejected,
   commitComplaint.rejected,
   loadLedger.rejected,
 ] as const;
@@ -68,12 +79,37 @@ const rejectedActions = [
 const complaintSlice = createSlice({
   name: "complaints",
   initialState,
-  reducers: {},
+  reducers: {
+    resetWorkflow: () => initialState,
+    updateFieldLocally: (
+      state,
+      action: { payload: { field: keyof ComplaintFields; value: string } },
+    ) => {
+      if (!state.activeDraft) return;
+      state.activeDraft.fields[action.payload.field] = action.payload.value;
+      const required: (keyof ComplaintFields)[] = [
+        "complaint_source",
+        "customer_name",
+        "product_name",
+        "batch_lot_number",
+        "complaint_category",
+        "complaint_description",
+      ];
+      const missing = required.filter(
+        (name) => !state.activeDraft?.fields[name]?.trim(),
+      );
+      state.activeDraft.completeness.is_complete = missing.length === 0;
+      state.activeDraft.completeness.missing_fields = missing;
+      state.activeDraft.status = missing.length === 0 ? "ready_to_commit" : "needs_review";
+      state.hasUnsavedEdits = true;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(analyzeText.fulfilled, setDraft)
       .addCase(analyzeFile.fulfilled, setDraft)
       .addCase(sendCorrection.fulfilled, setDraft)
+      .addCase(saveFields.fulfilled, setDraft)
       .addCase(commitComplaint.fulfilled, (state, action) => {
         state.requestStatus = "succeeded";
         state.error = null;
@@ -106,7 +142,10 @@ function setDraft(
   state.messages = action.payload.messages;
   state.requestStatus = "succeeded";
   state.error = null;
+  state.hasUnsavedEdits = false;
 }
+
+export const { resetWorkflow, updateFieldLocally } = complaintSlice.actions;
 
 export const selectActiveDraft = (state: { complaints: ComplaintState }) =>
   state.complaints.activeDraft;
@@ -117,5 +156,7 @@ export const selectLedger = (state: { complaints: ComplaintState }) =>
 export const selectRequestStatus = (state: { complaints: ComplaintState }) =>
   state.complaints.requestStatus;
 export const selectError = (state: { complaints: ComplaintState }) => state.complaints.error;
+export const selectHasUnsavedEdits = (state: { complaints: ComplaintState }) =>
+  state.complaints.hasUnsavedEdits;
 
 export default complaintSlice.reducer;

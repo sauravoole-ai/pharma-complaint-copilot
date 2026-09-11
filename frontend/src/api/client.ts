@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import type { ComplaintResponse, DraftResponse } from "../types/complaint";
+import type {
+  ComplaintFields,
+  ComplaintResponse,
+  DraftResponse,
+} from "../types/complaint";
 
 const fieldsSchema = z
   .object({
@@ -125,6 +129,17 @@ export function sendCorrection(draftId: string, message: string): Promise<DraftR
     method: "PATCH",
     headers: jsonHeaders,
     body: JSON.stringify({ message }),
+  });
+}
+
+export function updateFields(
+  draftId: string,
+  fields: ComplaintFields,
+): Promise<DraftResponse> {
+  return request(`/api/v1/complaint-drafts/${draftId}/fields`, draftSchema, {
+    method: "PATCH",
+    headers: jsonHeaders,
+    body: JSON.stringify({ fields }),
   });
 }
 
