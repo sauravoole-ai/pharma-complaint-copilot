@@ -1,15 +1,17 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import { useAppDispatch, useAppSelector } from "../store";
 import {
   analyzeFile,
   analyzeText,
   commitComplaint,
+  loadLedger,
   resetWorkflow,
   saveFields,
   selectActiveDraft,
   selectError,
   selectHasUnsavedEdits,
+  selectLedger,
   selectMessages,
   selectRequestStatus,
   sendCorrection,
@@ -17,6 +19,7 @@ import {
 } from "../store/complaintSlice";
 import type { ComplaintFields } from "../types/complaint";
 import { ComplaintForm } from "./ComplaintForm";
+import { ComplaintLedger } from "./ComplaintLedger";
 import { CopilotPanel } from "./CopilotPanel";
 import { WorkflowStatus } from "./WorkflowStatus";
 
@@ -27,9 +30,21 @@ export function ComplaintWorkspace() {
   const requestStatus = useAppSelector(selectRequestStatus);
   const error = useAppSelector(selectError);
   const hasUnsavedEdits = useAppSelector(selectHasUnsavedEdits);
+  const ledger = useAppSelector(selectLedger);
   const [sourceText, setSourceText] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
+  const refreshedCommit = useRef<string | null>(null);
   const busy = requestStatus === "loading";
+  const committedRecord = draft
+    ? ledger.find((record) => record.source_draft_id === draft.id)
+    : undefined;
+
+  useEffect(() => {
+    if (draft?.status === "committed" && refreshedCommit.current !== draft.id) {
+      refreshedCommit.current = draft.id;
+      void dispatch(loadLedger());
+    }
+  }, [dispatch, draft?.id, draft?.status]);
 
   function upload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -60,6 +75,7 @@ export function ComplaintWorkspace() {
           <span><strong>AIVOA</strong><small>Quality intelligence</small></span>
         </a>
         <div className="environment"><span /> Controlled demo environment</div>
+        <a className="ledger-link" href="#ledger">View ledger</a>
       </header>
 
       <main id="top">
@@ -130,6 +146,13 @@ export function ComplaintWorkspace() {
               </button>
             </div>
             {error && <p className="error-banner" role="alert">{error}</p>}
+            {committedRecord && (
+              <div className="commit-confirmation" role="status">
+                <span aria-hidden="true">✓</span>
+                Saved as QMS-{committedRecord.id.slice(0, 8).toUpperCase()}. The record is now
+                visible in the ledger.
+              </div>
+            )}
             <section className="workspace" aria-busy={busy}>
               <article className="form-panel">
                 <div className="panel-heading">
@@ -176,6 +199,7 @@ export function ComplaintWorkspace() {
             </section>
           </>
         )}
+        <ComplaintLedger complaints={ledger} loading={busy && ledger.length === 0} />
       </main>
       <footer>
         <span>Decision-support prototype</span>
