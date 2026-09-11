@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     groq_api_key: str | None = None
     groq_model: str = "llama-3.3-70b-versatile"
     frontend_origin: str = "http://localhost:5173"
-    max_upload_bytes: int = Field(default=10_000_000, gt=0)
+    max_upload_bytes: int = Field(default=5 * 1024 * 1024, gt=0)
 
 
 @lru_cache

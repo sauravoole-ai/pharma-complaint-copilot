@@ -47,10 +47,17 @@ class CorrectionOutput(StrictModel):
 
 class GroqLLMAdapter:
     def __init__(self, *, api_key: str | None, model: str):
-        if not api_key:
-            raise LLMConfigurationError("GROQ_API_KEY is required")
-        self.client = Groq(api_key=api_key)
+        self.api_key = api_key
         self.model = model
+        self._client: Groq | None = None
+
+    @property
+    def client(self) -> Groq:
+        if not self.api_key:
+            raise LLMConfigurationError("GROQ_API_KEY is required")
+        if self._client is None:
+            self._client = Groq(api_key=self.api_key)
+        return self._client
 
     def extract(self, source_text: str) -> ComplaintFields:
         return self._structured(
