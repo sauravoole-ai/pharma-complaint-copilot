@@ -26,6 +26,10 @@ class DraftNotReadyError(ValueError):
     pass
 
 
+class DraftAlreadyCommittedError(ValueError):
+    pass
+
+
 def _aware(value: datetime) -> datetime:
     return value.replace(tzinfo=UTC) if value.tzinfo is None else value
 
@@ -107,6 +111,14 @@ class ComplaintRepository:
         )
         if existing:
             return _complaint_response(existing)
+
+        committed_draft = self.session.scalar(
+            select(ComplaintModel).where(ComplaintModel.source_draft_id == draft_id)
+        )
+        if committed_draft:
+            raise DraftAlreadyCommittedError(
+                "Draft was already committed with a different commit token"
+            )
 
         draft = self._require_draft(draft_id)
         if draft.status != DraftStatus.READY_TO_COMMIT.value:

@@ -5,8 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.ai.llm import GroqLLMAdapter, LLMAdapter
+from app.api.complaints import create_complaints_router
 from app.api.drafts import create_drafts_router
-from app.api.health import router as health_router
+from app.api.health import create_health_router
 from app.config import Settings, get_settings
 from app.db import SessionLocal
 
@@ -35,7 +36,7 @@ def create_app(
         allow_methods=["GET", "POST", "PATCH"],
         allow_headers=["Content-Type", "Idempotency-Key"],
     )
-    application.include_router(health_router)
+    application.include_router(create_health_router(session_factory=resolved_session_factory))
     application.include_router(
         create_drafts_router(
             settings=resolved_settings,
@@ -43,6 +44,7 @@ def create_app(
             session_factory=resolved_session_factory,
         )
     )
+    application.include_router(create_complaints_router(session_factory=resolved_session_factory))
     return application
 
 
