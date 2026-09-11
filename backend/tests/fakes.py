@@ -2,8 +2,14 @@ from app.domain.schemas import ComplaintFields, RiskSuggestion, Severity
 
 
 class FakeLLMAdapter:
-    def __init__(self, *, omit_batch: bool = False):
+    def __init__(
+        self,
+        *,
+        omit_batch: bool = False,
+        correction: dict[str, str | None] | None = None,
+    ):
         self.omit_batch = omit_batch
+        self.correction = {"batch_lot_number": "BMX240602"} if correction is None else correction
         self.calls: list[str] = []
 
     def extract(self, source_text: str) -> ComplaintFields:
@@ -35,4 +41,4 @@ class FakeLLMAdapter:
 
     def correction_patch(self, fields: ComplaintFields, instruction: str) -> dict[str, str | None]:
         self.calls.append("correction_patch")
-        return {"batch_lot_number": "BMX240602"}
+        return self.correction

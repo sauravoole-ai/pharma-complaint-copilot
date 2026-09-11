@@ -1,4 +1,5 @@
 from io import BytesIO
+from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -73,3 +74,30 @@ def test_non_pdf_upload_is_rejected(client):
 
     assert response.status_code == 415
     assert response.json()["code"] == "unsupported_media_type"
+
+
+def test_conversation_correction_updates_and_revalidates_draft(client):
+    created = client.post(
+        "/api/v1/complaint-drafts/analyze-text",
+        json={"text": "A sufficiently detailed complaint for the deterministic fake adapter."},
+    ).json()
+
+    response = client.patch(
+        f"/api/v1/complaint-drafts/{created['id']}/conversation",
+        json={"message": "The batch number is BMX240602."},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["fields"]["batch_lot_number"] == "BMX240602"
+    assert response.json()["status"] == "ready_to_commit"
+    assert response.json()["messages"][-1]["content"] == "Updated: batch / lot number."
+
+
+def test_conversation_for_missing_draft_returns_404(client):
+    response = client.patch(
+        f"/api/v1/complaint-drafts/{uuid4()}/conversation",
+        json={"message": "Correct the batch number."},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["code"] == "draft_not_found"
