@@ -101,6 +101,16 @@ RUN_LIVE_AI=1 GROQ_API_KEY=your_key uv run pytest tests/live/test_groq_smoke.py 
 
 Deployment manifests are included for a Render API (`render.yaml`) and Vercel Vite client (`frontend/vercel.json`). They contain no credentials; configure the unsupplied values in the chosen platform only when deploying.
 
+## Submission and review material
+
+- [`docs/submission/demo-script.md`](docs/submission/demo-script.md): a timed 5–10 minute product demonstration.
+- [`docs/submission/code-walkthrough.md`](docs/submission/code-walkthrough.md): a timed 5–10 minute end-to-end engineering walkthrough.
+- [`docs/submission/form-checklist.md`](docs/submission/form-checklist.md): evidence and final human-submission gates.
+- [`docs/verification/production.md`](docs/verification/production.md): the production verification record to complete only after deployment.
+- [`docs/verification/live-integration.md`](docs/verification/live-integration.md): current local evidence and explicitly unverified live integrations.
+
+Repository, deployment, video, and submission-form URLs are intentionally not invented. They must be added only after the corresponding external action succeeds and is independently verified.
+
 ## Synthetic test inputs
 
 - `samples/discoloration-complaint.txt`: paste-flow example.
