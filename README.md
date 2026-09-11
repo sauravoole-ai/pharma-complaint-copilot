@@ -92,6 +92,15 @@ npm run test:e2e
 
 The end-to-end test uses an in-memory SQLite database and deterministic fake model only as a test harness. Production configuration remains PostgreSQL + Groq.
 
+For the complete offline suite, run `npm run verify` from the repository root. The live Groq smoke test is intentionally opt-in:
+
+```bash
+cd backend
+RUN_LIVE_AI=1 GROQ_API_KEY=your_key uv run pytest tests/live/test_groq_smoke.py -q
+```
+
+Deployment manifests are included for a Render API (`render.yaml`) and Vercel Vite client (`frontend/vercel.json`). They contain no credentials; configure the unsupplied values in the chosen platform only when deploying.
+
 ## Synthetic test inputs
 
 - `samples/discoloration-complaint.txt`: paste-flow example.

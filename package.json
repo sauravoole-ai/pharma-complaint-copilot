@@ -4,7 +4,10 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify": "npm run verify:backend && npm run verify:frontend",
+    "verify:backend": "cd backend && uv run --offline --extra dev pytest -q && uv run --offline --extra dev ruff check . && uv run --offline --extra dev ruff format --check .",
+    "verify:frontend": "cd frontend && npm test -- --run && npm run typecheck && npm run build"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0"
