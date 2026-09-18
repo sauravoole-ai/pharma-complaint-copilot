@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Protocol, TypeVar
 
 from groq import Groq
@@ -7,6 +8,7 @@ from pydantic import BaseModel, ValidationError, field_validator
 from app.domain.schemas import ComplaintFields, RiskSuggestion, StrictModel
 
 StructuredOutput = TypeVar("StructuredOutput", bound=BaseModel)
+logger = logging.getLogger(__name__)
 
 
 class LLMConfigurationError(RuntimeError):
@@ -134,6 +136,17 @@ class GroqLLMAdapter:
                 raise ValueError("Provider returned empty content")
             return schema.model_validate_json(content)
         except (IndexError, TypeError, ValueError, ValidationError) as exc:
+            logger.warning(
+                "Groq analysis failed category=invalid_structured_output schema=%s",
+                schema.__name__,
+            )
             raise LLMProviderError("The AI response did not match the required schema") from exc
         except Exception as exc:
+            status = getattr(exc, "status_code", None)
+            safe_status = status if type(status) is int and 100 <= status <= 599 else "unknown"
+            logger.warning(
+                "Groq analysis failed category=provider_request status=%s schema=%s",
+                safe_status,
+                schema.__name__,
+            )
             raise LLMProviderError("The AI provider request failed") from exc

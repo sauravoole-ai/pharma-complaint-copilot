@@ -4,6 +4,16 @@ An AI-assisted customer complaint intake prototype for pharmaceutical quality te
 
 This project was built for the AIVOA AI Product Engineer internship assignment. All included complaint examples are synthetic.
 
+This is an independently developed assignment prototype, not an official AIVOA product or endorsement.
+
+## Deployment status
+
+- [Public source repository](https://github.com/sauravoole-ai/pharma-complaint-copilot)
+- [Backend health endpoint](https://pharma-complaint-copilot-api.onrender.com/api/v1/health)
+- No verified public frontend yet. The prior live analysis returned HTTP 502;
+  live AI and the complete production workflow have not passed verification.
+- Dated evidence and remaining gates are recorded in `docs/verification/live-integration.md`.
+
 ## What the product demonstrates
 
 - React + Redux Toolkit workflow with a responsive two-panel review experience.
@@ -109,7 +119,7 @@ Deployment manifests are included for a Render API (`render.yaml`) and Vercel Vi
 - [`docs/verification/production.md`](docs/verification/production.md): the production verification record to complete only after deployment.
 - [`docs/verification/live-integration.md`](docs/verification/live-integration.md): current local evidence and explicitly unverified live integrations.
 
-Repository, deployment, video, and submission-form URLs are intentionally not invented. They must be added only after the corresponding external action succeeds and is independently verified.
+Video and frontend URLs must be added only after the corresponding external action succeeds and is independently verified. A deployed backend alone is not a working-product claim.
 
 ## Synthetic test inputs
 

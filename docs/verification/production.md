@@ -1,6 +1,9 @@
 # Production Verification Record
 
-Status: **not yet executed**. External repository, database, backend, frontend, environment-variable, and form operations require explicit user authorization at action time.
+Status: **partial deployment; full production workflow not verified**.
+Repository/database/backend deployment was authorized and performed. Frontend deployment,
+full browser checks, videos, and submission remain pending. Form submission is not authorized.
+See `live-integration.md` for dated observations; live deployment status is not proof of AI success.
 
 This file is a factual run sheet, not evidence that production has passed. Replace each `PENDING` only with an observed result and UTC timestamp.
 
@@ -8,9 +11,9 @@ This file is a factual run sheet, not evidence that production has passed. Repla
 
 | Item | Approved destination | Observed URL / identifier |
 |---|---|---|
-| GitHub repository | PENDING | PENDING |
-| PostgreSQL database | PENDING | Record provider/project name only; never record credentials |
-| Render backend | PENDING | PENDING |
+| GitHub repository | sauravoole-ai/pharma-complaint-copilot | https://github.com/sauravoole-ai/pharma-complaint-copilot |
+| PostgreSQL database | Supabase | Project xmehpxotgxrnqatyucfp; no credentials recorded |
+| Render backend | pharma-complaint-copilot-api | https://pharma-complaint-copilot-api.onrender.com |
 | Vercel frontend | PENDING | PENDING |
 
 ## Configuration checks
@@ -29,7 +32,7 @@ This file is a factual run sheet, not evidence that production has passed. Repla
 | Scenario | Expected evidence | Result | UTC time |
 |---|---|---|---|
 | Health | `GET /api/v1/health` returns healthy service/database response | PENDING | PENDING |
-| Text intake | Synthetic text creates a structured draft | PENDING | PENDING |
+| Text intake | Synthetic text creates a structured draft | FAILED: HTTP 502 ai_analysis_failed; cause unknown | 2026-09-12; exact time not retained |
 | PDF intake | Selectable-text synthetic PDF creates a structured draft | PENDING | PENDING |
 | Correction | Batch/quantity correction changes only permitted fields and reruns derived outputs | PENDING | PENDING |
 | Direct edit | Edited form fields persist after blur/save | PENDING | PENDING |
@@ -53,8 +56,8 @@ Run in a fresh private browser window with no provider session. HTTP success alo
 ## Final production verdict
 
 - Frontend URL: `PENDING`
-- Backend health URL: `PENDING`
-- Verification result: `NOT RUN`
+- Backend health URL: `https://pharma-complaint-copilot-api.onrender.com/api/v1/health`
+- Verification result: `PARTIAL; FULL WORKFLOW NOT PASSED`
 - Verified by: `PENDING`
 - Verified at (UTC): `PENDING`
 - Remaining limitations: `PENDING`
