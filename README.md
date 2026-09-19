@@ -10,8 +10,8 @@ This is an independently developed assignment prototype, not an official AIVOA p
 
 - [Public source repository](https://github.com/sauravoole-ai/pharma-complaint-copilot)
 - [Backend health endpoint](https://pharma-complaint-copilot-api.onrender.com/api/v1/health)
-- No verified public frontend yet. The prior live analysis returned HTTP 502;
-  live AI and the complete production workflow have not passed verification.
+- The deployed backend passed synthetic text, PDF, and correction checks on 19 September 2026.
+- No verified public frontend yet; browser, commit, idempotency, and ledger-refresh checks remain pending.
 - Dated evidence and remaining gates are recorded in `docs/verification/live-integration.md`.
 
 ## What the product demonstrates

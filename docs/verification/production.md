@@ -20,8 +20,8 @@ This file is a factual run sheet, not evidence that production has passed. Repla
 
 | Check | Expected | Result | UTC time |
 |---|---|---|---|
-| Backend database | PostgreSQL connection succeeds after migration | PENDING | PENDING |
-| Backend AI | Groq key configured without disclosure | PENDING | PENDING |
+| Backend database | PostgreSQL connection succeeds after migration | PASS: health reports database available | 2026-09-19 UTC |
+| Backend AI | Groq key configured without disclosure | PASS: live synthetic analyses completed; credential not disclosed | 2026-09-19 UTC |
 | Groq model | Configured accessible production model | `openai/gpt-oss-20b`; live text/PDF analysis passed | 2026-09-18 UTC |
 | Backend CORS | Exact public frontend origin | PENDING | PENDING |
 | Frontend API origin | Exact public backend origin | PENDING | PENDING |
@@ -31,10 +31,10 @@ This file is a factual run sheet, not evidence that production has passed. Repla
 
 | Scenario | Expected evidence | Result | UTC time |
 |---|---|---|---|
-| Health | `GET /api/v1/health` returns healthy service/database response | PENDING | PENDING |
-| Text intake | Synthetic text creates a structured draft | FAILED: HTTP 502 ai_analysis_failed; cause unknown | 2026-09-12; exact time not retained |
-| PDF intake | Selectable-text synthetic PDF creates a structured draft | PENDING | PENDING |
-| Correction | Batch/quantity correction changes only permitted fields and reruns derived outputs | PENDING | PENDING |
+| Health | `GET /api/v1/health` returns healthy service/database response | PASS: HTTP 200; status ok; database available | 2026-09-19 UTC |
+| Text intake | Synthetic text creates a structured draft | PASS: HTTP 201; ready-to-review draft | 2026-09-19 UTC |
+| PDF intake | Selectable-text synthetic PDF creates a structured draft | PASS: HTTP 201; ready-to-review draft | 2026-09-19 UTC |
+| Correction | Batch/quantity correction changes only permitted fields and reruns derived outputs | PASS: HTTP 200; quantity and summary both updated | 2026-09-19 UTC |
 | Direct edit | Edited form fields persist after blur/save | PENDING | PENDING |
 | Commit gate | Incomplete or unsaved draft cannot commit | PENDING | PENDING |
 | Commit | Explicit human action creates exactly one ledger record | PENDING | PENDING |

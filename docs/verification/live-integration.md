@@ -34,6 +34,21 @@ Authentication on the user's laptop does not authenticate this workspace.
 - A stale-value summary and overly directive suggested action were observed after correction/PDF
   analysis. They are tracked as release blockers; production workflow is not yet fully passed.
 
+## Safety and consistency release: 2026-09-19 UTC
+
+- GitHub `main` and Render deploy `dep-dana39oae00c73e2gnb0` use commit
+  `8a7e9a9106d71ba135f977857e78472c68442357`.
+- Health returned HTTP 200 with the database reported available.
+- Synthetic text analysis returned HTTP 201 with a structured, ready-to-review draft.
+- A correction from 48 to 25 capsules returned HTTP 200; the regenerated summary used 25,
+  resolving the previously observed stale-value conflict.
+- Synthetic selectable-text PDF analysis returned HTTP 201. The suggested action remained an
+  internal investigation and human-review escalation rather than directing a recall or regulatory
+  notification.
+- Render returned no error-level logs for the checked period after deployment.
+- No complaint was committed. Public-frontend, browser, explicit-commit, idempotency, and
+  ledger-refresh verification remain pending, so this is not a full production-workflow pass.
+
 ## Historical local result
 
 ## Fresh offline verification: 2026-09-18
