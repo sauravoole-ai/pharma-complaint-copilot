@@ -1,6 +1,6 @@
 # Code and Architecture Walkthrough
 
-Target: **8–9 minutes** (assignment allowance: 5–10 minutes). Use a readable editor font and follow one request end to end. Explain decisions in your own words; do not read source files line by line.
+This reference follows one request end to end and highlights the system's principal engineering decisions.
 
 ## Files to pre-open
 
@@ -40,7 +40,10 @@ In `backend/app/api/drafts.py`, trace `/analyze-text` and `/analyze-file`. Show 
 
 In `backend/app/ai/graph.py`, follow the nodes: normalize input, extract, validate, assess completeness, suggest risk, summarize, and assemble the draft. In `llm.py`, show the adapter protocol and Groq structured-output calls.
 
-Explain the model choice factually: the assignment names `gemma2-9b-it` and allows `llama-3.3-70b-versatile` for context; this implementation defaults to the latter through `GROQ_MODEL`, keeping it configurable and covered by contracts rather than hard-wiring model-shaped output into business logic.
+Explain the model choice factually: the assignment's preferred `gemma2-9b-it` is retired,
+and live verification found the allowed `llama-3.3-70b-versatile` unavailable to the configured
+Groq project (HTTP 404). The implementation therefore uses the current production model
+`openai/gpt-oss-20b`, which supports JSON Object Mode, through configurable `GROQ_MODEL`.
 
 ### 4:35–5:25 — Deterministic safety and corrections
 
@@ -75,11 +78,10 @@ Be able to answer, without notes:
 - Which tests would change if a complaint field or workflow node were added.
 - What the prototype proves and what would still be required for a regulated production system.
 
-## Code-video acceptance pass
+## Walkthrough review checklist
 
-- Duration is 5–10 minutes and the shared link opens without requesting access.
 - One complete request is traced from input to Redux, HTTP, FastAPI, LangGraph/Groq, validation, database, response, and rendered form.
 - The correction and explicit commit paths are explained, not merely shown.
 - Tests, failure behavior, configuration, model choice, and trade-offs are covered.
-- No secret, private provider page, terminal history, personal data, or unrelated repository is visible.
+- No secret or personal data is included.
 - Every claim matches the committed code and current verification records.

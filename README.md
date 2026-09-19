@@ -19,7 +19,7 @@ This is an independently developed assignment prototype, not an official AIVOA p
 - React + Redux Toolkit workflow with a responsive two-panel review experience.
 - Python + FastAPI API with strict Pydantic request and response contracts.
 - LangGraph orchestration for extraction, deterministic completeness checks, risk suggestion, and summary.
-- Groq structured JSON output using a configurable model (`llama-3.3-70b-versatile` by default).
+- Groq structured JSON output using a configurable model (`openai/gpt-oss-20b` by default).
 - PostgreSQL JSONB drafts and normalized committed ledger records through SQLAlchemy and Alembic.
 - Text and bounded PDF intake, controlled conversational patches, direct form-edit persistence, and idempotent human commit.
 - Explicit AI labels, missing-field states, safe errors, and no fabricated fallback data.
@@ -74,7 +74,7 @@ Open `http://localhost:5173`.
 |---|---|---|
 | `DATABASE_URL` | SQLAlchemy PostgreSQL connection | local `complaints` database |
 | `GROQ_API_KEY` | Groq API credential | required for analysis |
-| `GROQ_MODEL` | Groq model ID | `llama-3.3-70b-versatile` |
+| `GROQ_MODEL` | Groq model ID | `openai/gpt-oss-20b` |
 | `FRONTEND_ORIGIN` | Exact CORS origin | `http://localhost:5173` |
 | `MAX_UPLOAD_BYTES` | PDF byte limit | 5 MiB |
 | `VITE_API_BASE_URL` | Browser API origin | same origin |
@@ -111,15 +111,13 @@ RUN_LIVE_AI=1 GROQ_API_KEY=your_key uv run pytest tests/live/test_groq_smoke.py 
 
 Deployment manifests are included for a Render API (`render.yaml`) and Vercel Vite client (`frontend/vercel.json`). They contain no credentials; configure the unsupplied values in the chosen platform only when deploying.
 
-## Submission and review material
+## Engineering and verification material
 
-- [`docs/submission/demo-script.md`](docs/submission/demo-script.md): a timed 5–10 minute product demonstration.
-- [`docs/submission/code-walkthrough.md`](docs/submission/code-walkthrough.md): a timed 5–10 minute end-to-end engineering walkthrough.
-- [`docs/submission/form-checklist.md`](docs/submission/form-checklist.md): evidence and final human-submission gates.
+- [`docs/submission/code-walkthrough.md`](docs/submission/code-walkthrough.md): an end-to-end engineering walkthrough.
 - [`docs/verification/production.md`](docs/verification/production.md): the production verification record to complete only after deployment.
 - [`docs/verification/live-integration.md`](docs/verification/live-integration.md): current local evidence and explicitly unverified live integrations.
 
-Video and frontend URLs must be added only after the corresponding external action succeeds and is independently verified. A deployed backend alone is not a working-product claim.
+Frontend URLs must be added only after the deployment succeeds and is independently verified. A deployed backend alone is not a working-product claim.
 
 ## Synthetic test inputs
 

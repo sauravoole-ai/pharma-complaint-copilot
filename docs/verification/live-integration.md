@@ -22,6 +22,18 @@ still use `f3cd68e1936f5f595d745d508d21d3ab1895f169`.
 - Current workspace GitHub write access and CLI network restrictions block publication.
 Authentication on the user's laptop does not authenticate this workspace.
 
+## Live AI update: 2026-09-18 UTC
+
+- Safe diagnostics deployed at commit `c37e21bac9bc98da2d301cf3ebf040f9b1e2c598`.
+- `llama-3.3-70b-versatile` returned provider HTTP 404 during extraction.
+- Render `GROQ_MODEL` was changed to `openai/gpt-oss-20b`; no secret changed.
+- Synthetic text analysis returned HTTP 201 and created a review draft.
+- Synthetic selectable-text PDF analysis returned HTTP 201 and created a ready-to-review draft.
+- Conversational correction returned HTTP 200 and updated only the requested structured fields.
+- No draft was committed to the ledger during these checks.
+- A stale-value summary and overly directive suggested action were observed after correction/PDF
+  analysis. They are tracked as release blockers; production workflow is not yet fully passed.
+
 ## Historical local result
 
 ## Fresh offline verification: 2026-09-18

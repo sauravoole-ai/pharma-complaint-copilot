@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/complaints"
     groq_api_key: str | None = None
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "openai/gpt-oss-20b"
     frontend_origin: str = "http://localhost:5173"
     max_upload_bytes: int = Field(default=5 * 1024 * 1024, gt=0)
 

@@ -73,21 +73,37 @@ class GroqLLMAdapter:
         )
 
     def suggest_risk(self, fields: ComplaintFields) -> RiskSuggestion:
-        return self._structured(
+        suggestion = self._structured(
             system=(
                 "You are a pharmaceutical complaint triage assistant. Suggest Minor, Major, or "
                 "Critical severity, a prudent next action, and a concise rationale. This is a "
-                "reviewable suggestion, not a final regulatory or clinical decision."
+                "reviewable suggestion, not a final regulatory or clinical decision. Do not "
+                "direct a recall and do not direct regulatory notification. Recommend escalation "
+                "to a human quality reviewer for investigation and controlled decisions."
             ),
             user=f"Assess this extracted complaint:\n{fields.model_dump_json(indent=2)}",
             schema=RiskSuggestion,
         )
+        action = suggestion.next_action.lower()
+        if any(term in action for term in ("recall", "regulator", "regulatory author")):
+            suggestion = suggestion.model_copy(
+                update={
+                    "next_action": (
+                        "Escalate promptly to a qualified human quality reviewer for "
+                        "investigation, containment assessment, and controlled field or "
+                        "regulatory decisions under approved procedures."
+                    )
+                }
+            )
+        return suggestion
 
     def summarize(self, fields: ComplaintFields) -> str:
         result = self._structured(
             system=(
                 "Summarize the supplied complaint facts in one or two neutral sentences. Do not "
-                "add facts, causality, or conclusions."
+                "add facts, causality, or conclusions. The structured fields are authoritative. "
+                "When values conflict, use structured field values and do not repeat conflicting "
+                "values from narrative fields such as complaint_source or complaint_description."
             ),
             user=fields.model_dump_json(indent=2),
             schema=SummaryOutput,

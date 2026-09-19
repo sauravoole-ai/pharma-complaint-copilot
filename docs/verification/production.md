@@ -2,7 +2,7 @@
 
 Status: **partial deployment; full production workflow not verified**.
 Repository/database/backend deployment was authorized and performed. Frontend deployment,
-full browser checks, videos, and submission remain pending. Form submission is not authorized.
+and full browser checks remain pending.
 See `live-integration.md` for dated observations; live deployment status is not proof of AI success.
 
 This file is a factual run sheet, not evidence that production has passed. Replace each `PENDING` only with an observed result and UTC timestamp.
@@ -22,7 +22,7 @@ This file is a factual run sheet, not evidence that production has passed. Repla
 |---|---|---|---|
 | Backend database | PostgreSQL connection succeeds after migration | PENDING | PENDING |
 | Backend AI | Groq key configured without disclosure | PENDING | PENDING |
-| Groq model | `llama-3.3-70b-versatile`, unless deliberately changed and retested | PENDING | PENDING |
+| Groq model | Configured accessible production model | `openai/gpt-oss-20b`; live text/PDF analysis passed | 2026-09-18 UTC |
 | Backend CORS | Exact public frontend origin | PENDING | PENDING |
 | Frontend API origin | Exact public backend origin | PENDING | PENDING |
 | Secrets | No secret appears in repository, build log, browser bundle, or this record | PENDING | PENDING |
