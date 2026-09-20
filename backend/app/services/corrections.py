@@ -1,3 +1,5 @@
+import re
+
 from pydantic import ValidationError
 
 from app.ai.llm import LLMAdapter
@@ -25,6 +27,24 @@ class CorrectionResult(StrictModel):
     status: DraftStatus
     changed_fields: list[str]
     assistant_message: CopilotMessage
+
+
+def reconcile_corrected_summary(
+    summary: str,
+    previous_fields: ComplaintFields,
+    updated_fields: ComplaintFields,
+    changed_fields: list[str],
+) -> str:
+    """Keep a regenerated summary consistent with explicit structured corrections."""
+    reconciled = summary
+    for name in changed_fields:
+        previous_value = getattr(previous_fields, name)
+        updated_value = getattr(updated_fields, name)
+        if previous_value and updated_value and previous_value != updated_value:
+            reconciled = re.sub(
+                re.escape(previous_value), updated_value, reconciled, flags=re.IGNORECASE
+            )
+    return reconciled
 
 
 def apply_correction(

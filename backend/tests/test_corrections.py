@@ -1,7 +1,11 @@
 import pytest
 
 from app.domain.schemas import ComplaintFields, DraftStatus
-from app.services.corrections import InvalidCorrection, apply_correction
+from app.services.corrections import (
+    InvalidCorrection,
+    apply_correction,
+    reconcile_corrected_summary,
+)
 from tests.fakes import FakeLLMAdapter
 
 
@@ -37,6 +41,20 @@ def test_batch_and_quantity_correction_changes_only_two_fields(complete_fields):
     assert updated.fields.customer_name == complete_fields.customer_name
     assert updated.changed_fields == ["batch_lot_number", "affected_quantity"]
     assert updated.status == DraftStatus.READY_TO_COMMIT
+
+
+def test_reconcile_corrected_summary_replaces_a_stale_changed_value(complete_fields):
+    updated_fields = complete_fields.model_copy(update={"affected_quantity": "25 capsules"})
+
+    summary = reconcile_corrected_summary(
+        "Northstar Pharmacy reported that 40 capsules appeared darker than usual.",
+        complete_fields,
+        updated_fields,
+        ["affected_quantity"],
+    )
+
+    assert "25 capsules" in summary
+    assert "40 capsules" not in summary
 
 
 @pytest.mark.parametrize(

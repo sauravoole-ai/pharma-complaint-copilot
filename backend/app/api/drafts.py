@@ -20,7 +20,11 @@ from app.domain.schemas import (
     SourceType,
 )
 from app.repositories.complaints import ComplaintRepository
-from app.services.corrections import InvalidCorrection, apply_correction
+from app.services.corrections import (
+    InvalidCorrection,
+    apply_correction,
+    reconcile_corrected_summary,
+)
 from app.services.pdf_text import PdfTextError, extract_pdf_text
 from app.services.validation import validate_and_classify
 
@@ -96,7 +100,12 @@ def create_drafts_router(
                     fields=correction.fields,
                     completeness=correction.completeness,
                     risk=llm.suggest_risk(correction.fields),
-                    summary=llm.summarize(correction.fields),
+                    summary=reconcile_corrected_summary(
+                        llm.summarize(correction.fields),
+                        draft.fields,
+                        correction.fields,
+                        correction.changed_fields,
+                    ),
                     status=correction.status,
                     messages=[
                         *draft.messages,
