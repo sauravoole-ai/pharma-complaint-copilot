@@ -126,6 +126,7 @@ export function ComplaintWorkspace() {
                 className="visually-hidden"
                 type="file"
                 accept="application/pdf"
+                aria-label="Upload text-based PDF"
                 onChange={upload}
               />
             </div>

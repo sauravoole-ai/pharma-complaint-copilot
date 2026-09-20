@@ -59,7 +59,35 @@ function renderWorkspace(draft: DraftResponse): void {
   );
 }
 
+function renderIntake(): void {
+  const preloadedState: { complaints: ComplaintState } = {
+    complaints: {
+      activeDraft: null,
+      messages: [],
+      ledger: [],
+      requestStatus: "idle",
+      error: null,
+      hasUnsavedEdits: false,
+    },
+  };
+  const store = configureStore({
+    reducer: { complaints: complaintReducer },
+    preloadedState,
+  });
+  render(
+    <Provider store={store}>
+      <ComplaintWorkspace />
+    </Provider>,
+  );
+}
+
 describe("complaint workspace", () => {
+  it("gives the PDF upload input an accessible name", () => {
+    renderIntake();
+
+    expect(screen.getByLabelText("Upload text-based PDF")).toHaveAttribute("type", "file");
+  });
+
   it("populates editable fields and labels AI recommendations", () => {
     renderWorkspace(readyDraft);
 
