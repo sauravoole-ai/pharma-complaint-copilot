@@ -1,92 +1,38 @@
 # Live Integration Record
 
-Historical local checkpoint: 2026-09-11 UTC. Deployment status update: 2026-09-18 UTC.
+Production verification completed on 2026-09-22 UTC using repository-owned synthetic samples only.
 
-## Deployment status update
-
-The sections below describe the original local checkpoint, not current deployment state.
-GitHub publication and Render deployment subsequently occurred. On 2026-09-18, the
-connected integrations confirmed both remote `main` and the latest live Render deploy
-still use `f3cd68e1936f5f595d745d508d21d3ab1895f169`.
+## Deployment
 
 - Repository: https://github.com/sauravoole-ai/pharma-complaint-copilot
-- API: https://pharma-complaint-copilot-api.onrender.com
-- Database: Supabase project `xmehpxotgxrnqatyucfp`; backend-only schema applied previously.
-- Prior live health check (2026-09-12): HTTP 200, database available.
-- Prior live synthetic text analysis (2026-09-12): HTTP 502, `ai_analysis_failed`.
-  The Groq root cause is not established. No success or end-to-end pass is claimed.
-- On 2026-09-18, the connected Vercel team project list contained no project for this app.
-- Safe Groq diagnostic code and regression tests exist locally only; not yet published.
-- The modified local `backend/uv.lock` is invalid TOML and must not be published.
-  Preserve that file; use the valid committed version in an isolated verification copy.
-- Current workspace GitHub write access and CLI network restrictions block publication.
-Authentication on the user's laptop does not authenticate this workspace.
+- Frontend: https://pharma-complaint-copilot.vercel.app
+- Vercel production deployment: `dpl_6ZTce67auLBniFNv2qu3tVDybh46` (`https://pharma-complaint-copilot-ix3rh5aud-sauravoole-1831s-projects.vercel.app`), Ready.
+- Backend: https://pharma-complaint-copilot-api.onrender.com
+- Render deployment: `dep-danvso3m8hqs73cp2610`, commit `61bb0bd16d33a1f332b7dbb11a2bedb40299d9d5`, live.
+- Health: `GET /api/v1/health` returned HTTP 200.
+- CORS: `FRONTEND_ORIGIN=https://pharma-complaint-copilot.vercel.app`; the health response returned that exact allow-origin value.
+- Groq model: `openai/gpt-oss-20b`.
 
-## Live AI update: 2026-09-18 UTC
+## Synthetic workflow evidence
 
-- Safe diagnostics deployed at commit `c37e21bac9bc98da2d301cf3ebf040f9b1e2c598`.
-- `llama-3.3-70b-versatile` returned provider HTTP 404 during extraction.
-- Render `GROQ_MODEL` was changed to `openai/gpt-oss-20b`; no secret changed.
-- Synthetic text analysis returned HTTP 201 and created a review draft.
-- Synthetic selectable-text PDF analysis returned HTTP 201 and created a ready-to-review draft.
-- Conversational correction returned HTTP 200 and updated only the requested structured fields.
-- No draft was committed to the ledger during these checks.
-- A stale-value summary and overly directive suggested action were observed after correction/PDF
-  analysis. They are tracked as release blockers; production workflow is not yet fully passed.
+- Text sample `samples/discoloration-complaint.txt` produced a structured draft with batch `AMX240602` and `48 capsules`.
+- The authorized correction to `25 capsules` updated the structured field and regenerated the summary with `25 capsules`; the stale `48 capsules` value was absent from the summary.
+- PDF sample `samples/foreign-matter-complaint.pdf` produced a structured foreign-matter / visible-particulate draft with summary, completeness, advisory risk, and a human-review requirement.
+- Suggested next actions did not direct a recall or regulatory notification. They remained internal containment/investigation and qualified human-quality-review guidance.
+- Browser network evidence recorded only draft analysis/correction requests; it did not record `POST /api/v1/complaints`.
+- Public ledger count was 0 before and after verification. No complaint was committed; temporary drafts may remain.
 
-## Safety and consistency release: 2026-09-19 UTC
+## Browser and operational checks
 
-- GitHub `main` and Render deploy `dep-dana39oae00c73e2gnb0` use commit
-  `8a7e9a9106d71ba135f977857e78472c68442357`.
-- Health returned HTTP 200 with the database reported available.
-- Synthetic text analysis returned HTTP 201 with a structured, ready-to-review draft.
-- A correction from 48 to 25 capsules returned HTTP 200; the regenerated summary used 25,
-  resolving the previously observed stale-value conflict.
-- Synthetic selectable-text PDF analysis returned HTTP 201. The suggested action remained an
-  internal investigation and human-review escalation rather than directing a recall or regulatory
-  notification.
-- Render returned no error-level logs for the checked period after deployment.
-- No complaint was committed. Public-frontend, browser, explicit-commit, idempotency, and
-  ledger-refresh verification remain pending, so this is not a full production-workflow pass.
+- Fresh unauthenticated desktop and Pixel 7-sized sessions rendered AIVOA branding, intake, Copilot, and ledger areas without horizontal overflow or clipped primary controls.
+- The final Pixel 7 accessibility scan reported zero WCAG 2 A/AA violations. One decorative, `aria-hidden` ledger icon remained manual-review-only for contrast.
+- Browser page-error output was clean during the completed workflows. Public HTML, JavaScript, CSS, and backend health returned HTTP 200.
+- Render error-level logs and Vercel deployment logs were clean for the checked period.
 
-## Historical local result
+## Local verification
 
-## Fresh offline verification: 2026-09-18
+- Backend: 36 passed, 1 opt-in live test skipped; Ruff lint and format checks passed.
+- Frontend: 10 passed; TypeScript and Vite production build passed; production dependency audit reported zero vulnerabilities.
+- Focused tracked-file secret scan reported zero findings.
 
-An isolated archive of the committed source used its committed `backend/uv.lock`,
-with only the local safe-diagnostics adapter and regression tests copied in.
-The user's invalid modified lockfile remained untouched.
-
-- Frozen dependency installation completed on Python 3.12.14.
-- Backend: 32 passed, one opt-in live AI test skipped, one Starlette/AnyIO deprecation warning.
-- Ruff lint/format and Python compilation passed.
-- Alembic PostgreSQL SQL generation passed; this is not a live database test.
-- Frontend: 9 tests passed; TypeScript and production build passed after `npm ci`.
-- No live model call, ledger commit, external publication, or deployment occurred in this run.
-
-## Original local AI result
-
-Live Groq execution was not run because `GROQ_API_KEY` is not configured in this workspace. No provider request or billable model call was made. The opt-in smoke test is present at `backend/tests/live/test_groq_smoke.py` and skips unless both `RUN_LIVE_AI=1` and the credential are supplied.
-
-The configured model is `llama-3.3-70b-versatile`. Groq's current model page lists JSON Object Mode for that model: <https://console.groq.com/docs/model/llama-3.3-70b-versatile>.
-
-## Historical offline verification
-
-- Backend: 28 tests passed; Ruff lint and format checks passed; Python compilation passed.
-- Frontend: 9 tests passed; TypeScript passed; Vite production build passed.
-- Dependency audit: zero production vulnerabilities reported in both npm projects.
-- PostgreSQL: Alembic generated PostgreSQL DDL with JSONB, foreign key, and uniqueness constraints. A live PostgreSQL migration was not possible because neither Docker nor PostgreSQL binaries are installed in the workspace.
-- PDF: generated artifact is a valid one-page PDF and extraction recovered selectable complaint text.
-- Browser E2E: Playwright discovered desktop Chromium and Pixel 7 scenarios, and both web servers started. Execution is blocked because the Chromium CDN download timed out on all five attempts; no visual-pass claim is made.
-
-## Historical deployment configuration review
-
-- `render.yaml` uses a Python web service, `backend/` root directory, frozen uv install, pre-deploy Alembic migration, `$PORT`, and `/api/v1/health`.
-- `frontend/vercel.json` declares Vite, `npm run build`, and `dist` output.
-- `DATABASE_URL`, `GROQ_API_KEY`, and `FRONTEND_ORIGIN` remain unsupplied deployment secrets/settings.
-- No Git remote, GitHub repository, Render service, Vercel project, domain, or external environment variable was created or changed.
-
-Reference configuration documentation:
-
-- Render Blueprint spec: <https://render.com/docs/blueprint-spec>
-- Vercel project configuration: <https://vercel.com/docs/project-configuration/vercel-json>
+This independently developed AIVOA assignment prototype is decision support only. It is not a validated QMS, medical device, electronic-signature system, regulatory determination engine, or official AIVOA product. All test inputs used for these checks are synthetic.

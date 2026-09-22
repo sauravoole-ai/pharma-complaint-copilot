@@ -9,10 +9,11 @@ This is an independently developed assignment prototype, not an official AIVOA p
 ## Deployment status
 
 - [Public source repository](https://github.com/sauravoole-ai/pharma-complaint-copilot)
+- [Live frontend](https://pharma-complaint-copilot.vercel.app)
 - [Backend health endpoint](https://pharma-complaint-copilot-api.onrender.com/api/v1/health)
-- The deployed backend passed synthetic text, PDF, and correction checks on 19 September 2026.
-- No verified public frontend yet; browser, commit, idempotency, and ledger-refresh checks remain pending.
-- Dated evidence and remaining gates are recorded in `docs/verification/live-integration.md`.
+- The deployed frontend and backend passed synthetic text, PDF, correction, desktop, and Pixel 7 checks on 22 September 2026 UTC.
+- Production uses Groq model `openai/gpt-oss-20b`. AI output remains advisory; a qualified reviewer controls any ledger commit and all quality decisions.
+- Dated evidence and current limitations are recorded in `docs/verification/live-integration.md` and `docs/verification/production.md`.
 
 ## What the product demonstrates
 
@@ -79,7 +80,7 @@ Open `http://localhost:5173`.
 | `MAX_UPLOAD_BYTES` | PDF byte limit | 5 MiB |
 | `VITE_API_BASE_URL` | Browser API origin | same origin |
 
-Never commit `.env` or real complaint data.
+Never commit `.env*`, `.vercel/`, or real complaint data.
 
 ## Verification
 
@@ -114,10 +115,10 @@ Deployment manifests are included for a Render API (`render.yaml`) and Vercel Vi
 ## Engineering and verification material
 
 - [`docs/submission/code-walkthrough.md`](docs/submission/code-walkthrough.md): an end-to-end engineering walkthrough.
-- [`docs/verification/production.md`](docs/verification/production.md): the production verification record to complete only after deployment.
-- [`docs/verification/live-integration.md`](docs/verification/live-integration.md): current local evidence and explicitly unverified live integrations.
+- [`docs/verification/production.md`](docs/verification/production.md): the observed production verification record.
+- [`docs/verification/live-integration.md`](docs/verification/live-integration.md): current live integration evidence and limitations.
 
-Frontend URLs must be added only after the deployment succeeds and is independently verified. A deployed backend alone is not a working-product claim.
+The listed frontend URL was independently verified in production. A successful deployment remains separate from regulatory, QMS, or medical-device validation.
 
 ## Synthetic test inputs
 
